@@ -106,3 +106,13 @@ variable "infra-node-memory" {
   default = "3072"
   description = "Node Memory in MB"
 }
+
+variable "infra-node-data_disk" {
+  default = 10
+  description = "Data Disk in GB"
+}
+
+variable "infra-node-system_disk" {
+  default = 10
+  description = "System Disk in GB"
+}

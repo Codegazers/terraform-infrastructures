@@ -13,7 +13,12 @@ resource "libvirt_volume" "base-image" {
 }
 
 data "template_file" "user_data" {
+  count = length(var.infra-node-names)
   template = "${file("${path.module}/cloudinit_user.cfg")}"
+    vars = {
+    Domain = var.infra-network-domain
+    Hostname = var.infra-node-names[count.index]
+  }
 }
 
 data "template_file" "network_config" {
@@ -37,18 +42,23 @@ resource "libvirt_network" "vm_network"{
 }
 
 
+
 resource "libvirt_volume" "system" {
+    base_volume_id = "${libvirt_volume.base-image.id}"
     name = "${var.infra-node-names[count.index]}.qcow2"
     count = length(var.infra-node-names)
     pool = var.kvm_pool
-    source = "https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.img"
+    size = var.infra-node-system_disk * 1024 * 1024 * 1024
+    //source = "https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.img"
     format = "qcow2"
 }
+
+
 
 resource "libvirt_volume" "data" {
     name = "${var.infra-node-names[count.index]}-data.qcow2"
     count = length(var.infra-node-names)
-    size = 26843545600
+    size = var.infra-node-data_disk * 1024 * 1024 * 1024
     pool = var.kvm_pool
     format = "qcow2"
 }
@@ -56,7 +66,7 @@ resource "libvirt_volume" "data" {
 resource "libvirt_cloudinit_disk" "cloudinit" {
   name = "${var.infra-node-names[count.index]}-cloudinit.iso"
   count = length(var.infra-node-names)
-  user_data = data.template_file.user_data.rendered
+  user_data = data.template_file.user_data[count.index].rendered
   network_config =  data.template_file.network_config[count.index].rendered
   pool = var.kvm_pool
 }
@@ -107,6 +117,18 @@ resource "libvirt_domain" "instance" {
     listen_type = "address"
     autoport = "true"
   }
+
+  # provisioner "remote-exec" {
+  #   connection {
+  #     type     = "ssh"
+  #     user     = "provision"
+  #     password = "${var.root_password}"
+  #     host     = var.infra-network-addresses[count.index]
+  #     private_key = file("${path.module}/provision")
+  #   }
+  #   inline = ["sudo hostnamectl set-hostname ${var.infra-node-names[count.index]}"]
+  # }
+
   count = length(var.infra-node-names)
 
 }
