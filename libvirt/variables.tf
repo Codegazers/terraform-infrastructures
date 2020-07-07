@@ -57,6 +57,7 @@ variable "infra-network-nameserver" {
 }
 
 variable "infra-network-subnet" {
+  description = "Nodes' Subnet (For DHCP Only)"
   type = list(string)
   default = ["192.168.100.0/24"]
 }
@@ -67,8 +68,15 @@ variable "infra-network-gateway" {
 }
 
 variable "infra-network-addresses" {
+  description = "Node IP Addresses"
   type = list(string)
   default = ["192.168.100.11/24","192.168.100.12/24","192.168.100.13/24"]
+}
+
+variable "infra-network-bridge" {
+  description = "Enables libvirt Network Bridge Mode"
+  type = bool
+  default = false
 }
 
 variable "kvm_pool" {

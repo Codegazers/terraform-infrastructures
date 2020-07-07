@@ -32,19 +32,9 @@ data "template_file" "network_config" {
   }
 }
 
-
-resource "libvirt_network" "vm_network"{
-    name = var.infra-network-name
-    addresses = var.infra-network-subnet
-        dhcp {
-            enabled = true
-        }
-}
-
-
-
 resource "libvirt_volume" "system" {
-    base_volume_id = "${libvirt_volume.base-image.id}"
+    //base_volume_id = "${libvirt_volume.base-image.id}"
+    base_volume_id = libvirt_volume.base-image.id
     name = "${var.infra-node-names[count.index]}.qcow2"
     count = length(var.infra-node-names)
     pool = var.kvm_pool
@@ -52,8 +42,6 @@ resource "libvirt_volume" "system" {
     //source = "https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.img"
     format = "qcow2"
 }
-
-
 
 resource "libvirt_volume" "data" {
     name = "${var.infra-node-names[count.index]}-data.qcow2"
@@ -71,21 +59,36 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   pool = var.kvm_pool
 }
 
+resource "libvirt_network" "vm_network"{
+  name = var.infra-network-name
+  addresses = var.infra-network-subnet
+  dhcp {
+    enabled = true
+  }
+}
+
 resource "libvirt_domain" "instance" {
 
     name = element(var.infra-node-names, count.index)
     memory = var.infra-node-memory
     vcpu = var.infra-node-vcpu
 
-    /*network_interface {
-        bridge = "${var.kvm_bridge_interface}"
-    }*/
+  network_interface {
+    network_id = var.infra-network-bridge == false ? libvirt_network.vm_network.id : null
+    network_name = var.infra-network-bridge == "internal" ? var.infra-network-name : null
+    bridge = var.infra-network-bridge == false ? null : var.kvm_bridge_interface
 
-    network_interface {
+    wait_for_lease = var.infra-network-type == "dhcp" ? true : false
+
+  }
+
+
+    /*network_interface {
         network_id = libvirt_network.vm_network.id
         network_name = var.infra-network-name
-        //wait_for_lease = true
-    }
+        wait_for_lease = var.infra-network-type == "dhcp" ? true : false
+    }*/
+    //network_interface { bridge = var.kvm_bridge_interface }
 
   /* IMPORTANT
    Ubuntu can hang is a isa-serial is not present at boot time.
