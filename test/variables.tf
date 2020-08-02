@@ -16,22 +16,6 @@ variable "infra-lab" {
   description = "Infrastructure Environment Name"
 }
 
-# variable "infra-node-prefix" {
-#   type = string
-#   default = "node"
-#   description = "Nodes Prefix Names"
-# }
-
-# variable "infra-node-count" {
-#   default = 2
-#   description = "Number of Nodes"
-# }
-
-variable "infra-node-names" {
-  type = list(string)
-  default = ["node1", "node2"]
-}
-
 variable "infra-network-name" {
   type = string
   default = "labs"
@@ -67,12 +51,6 @@ variable "infra-network-gateway" {
   default = "192.168.100.1"
 }
 
-variable "infra-network-addresses" {
-  description = "Node IP Addresses"
-  type = list(string)
-  default = ["192.168.100.11/24","192.168.100.12/24","192.168.100.13/24"]
-}
-
 variable "infra-network-bridge" {
   description = "Enables libvirt Network Bridge Mode"
   type = bool
@@ -103,16 +81,20 @@ variable "kvm_bridge_interface" {
   description = "Local Hypervior Bridge Interface."
 }
 
-variable "infra-node-vcpu" {
-  type = string
-  default = "2"
-  description = "Node vCPU count"
-}
 
-variable "infra-node-memory" {
-  type = string
-  default = "3072"
-  description = "Node Memory in MB"
+variable "infra-nodes" {
+    type = list
+    description = "List of nodes and their attributes"
+    default = [
+      {
+        "nodename"  = "nodename",
+        "vcpu" = "2",
+        "mem_in_gb" = "4",
+        "sysdisk_in_gb" = 15,
+        "datadisk_in_gb" = 20,
+        "nodeip_with_mask" = "192.168.202.11/24"
+     },
+    ]
 }
 
 variable "infra-node-data_disk" {
@@ -123,32 +105,4 @@ variable "infra-node-data_disk" {
 variable "infra-node-system_disk" {
   default = 10
   description = "System Disk in GB"
-}
-
-
-variable "infra-node-cpu-sizes" {
-    type = map
-    default = {
-        "small"  = "1"
-        "large" = "2"
-        "xlarge" = "4"
-    }
-}
-
-variable "infra-node-memory-sizes" {
-    type = map
-    default = {
-        "small"  = "2"
-        "large" = "4"
-        "xlarge" = "8"
-    }
-}
-
-variable "infra-node-disk-sizes" {
-    type = map
-    default = {
-        "small"  = "20"
-        "large" = "40"
-        "xlarge" = "100"
-    }
 }

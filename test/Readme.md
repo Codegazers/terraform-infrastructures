@@ -9,9 +9,3 @@
 > ens3       52:54:00:be:96:da    ipv4         10.224.1.11/24
 > -          -                    ipv6         fe80::5054:ff:febe:96da/64
 >```
-
-
-```
-alias tssh='ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/provision -l provision'
-
-```

@@ -14,51 +14,75 @@ resource "libvirt_volume" "base-image" {
 }
 
 data "template_file" "user_data" {
-  count = length(var.infra-node-names)
+  count = length(var.infra-nodes)
   template = "${file("${path.module}/cloudinit_user.cfg")}"
     vars = {
     Domain = var.infra-network-domain
-    Hostname = var.infra-node-names[count.index]
+    Hostname = lookup(var.infra-nodes[count.index], "nodename")
   }
 }
 
 data "template_file" "network_config" {
-  count = length(var.infra-node-names)
+  count = length(var.infra-nodes)
   template = file("${path.module}/cloudinit_net_${var.infra-network-type}.cfg")
   vars = {
     Domain = var.infra-network-domain
     NameServer = var.infra-network-nameserver
     Gateway = var.infra-network-gateway
-    IPAddress = var.infra-network-addresses[count.index]
+    IPAddress = lookup(var.infra-nodes[count.index], "nodeip_with_mask")
   }
 }
 
+# resource "libvirt_volume" "system" {
+#     //base_volume_id = "${libvirt_volume.base-image.id}"
+#     base_volume_id = libvirt_volume.base-image.id
+#     name = "${lookup(var.infra-nodes[count.index], "nodename")}.qcow2"
+#     count = length(var.infra-nodes)
+#     pool = var.kvm_pool
+#     size = lookup(var.infra-nodes[count.index], "sysdisk_in_gb") * 1024 * 1024 * 1024
+#     //source = "https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.img"
+#     format = "qcow2"
+# }
+
+
+
+
+# resource "libvirt_volume" "data" {
+#     name = "${lookup(var.infra-nodes[count.index], "nodename")}-data.qcow2"
+#     count = length(var.infra-nodes)
+#     size = lookup(var.infra-nodes[count.index], "datadisk_in_gb") * 1024 * 1024 * 1024
+#     pool = var.kvm_pool
+#     format = "qcow2"
+# }
+
+
+
+
 resource "libvirt_volume" "system" {
-    //base_volume_id = "${libvirt_volume.base-image.id}"
+    name = "${lookup(var.infra-nodes[count.index], "nodename")}-system.qcow2"
     base_volume_id = libvirt_volume.base-image.id
-    name = "${var.infra-node-names[count.index]}.qcow2"
-    count = length(var.infra-node-names)
+    count = length(var.infra-nodes)
     pool = var.kvm_pool
     size = var.infra-node-system_disk * 1024 * 1024 * 1024
-    //source = "https://cloud-images.ubuntu.com/releases/bionic/release/ubuntu-18.04-server-cloudimg-amd64.img"
     format = "qcow2"
 }
 
-resource "libvirt_volume" "data" {
-    name = "${var.infra-node-names[count.index]}-data.qcow2"
-    count = length(var.infra-node-names)
-    size = var.infra-node-data_disk * 1024 * 1024 * 1024
-    pool = var.kvm_pool
-    format = "qcow2"
-}
+# resource "libvirt_volume" "data" {
+#     name = "${lookup(var.infra-nodes[count.index], "nodename")}-data.qcow2"
+#     count = length(var.infra-nodes)
+#     size = var.infra-node-data_disk * 1024 * 1024 * 1024
+#     pool = var.kvm_pool
+#     format = "qcow2"
+# }
 
 resource "libvirt_cloudinit_disk" "cloudinit" {
-  name = "${var.infra-node-names[count.index]}-cloudinit.iso"
-  count = length(var.infra-node-names)
+  name = "${lookup(var.infra-nodes[count.index], "nodename")}-cloudinit.iso"
+  count = length(var.infra-nodes)
   user_data = data.template_file.user_data[count.index].rendered
   network_config =  data.template_file.network_config[count.index].rendered
   pool = var.kvm_pool
 }
+
 
 resource "libvirt_network" "vm_network"{
   name = var.infra-network-name
@@ -70,9 +94,9 @@ resource "libvirt_network" "vm_network"{
 
 resource "libvirt_domain" "instance" {
 
-    name = element(var.infra-node-names, count.index)
-    memory = var.infra-node-memory
-    vcpu = var.infra-node-vcpu
+    name = lookup(var.infra-nodes[count.index], "nodename")
+    memory = lookup(var.infra-nodes[count.index], "mem_in_gb")
+    vcpu = lookup(var.infra-nodes[count.index], "vcpu")
 
   network_interface {
     network_id = var.infra-network-bridge == false ? libvirt_network.vm_network.id : null
@@ -112,9 +136,9 @@ resource "libvirt_domain" "instance" {
         volume_id = libvirt_volume.system[count.index].id
     }
 
-    disk {
-        volume_id = libvirt_volume.data[count.index].id
-    }
+    # disk {
+    #     volume_id = libvirt_volume.data[count.index].id
+    # }
 
   graphics {
     type = "spice"
@@ -133,7 +157,7 @@ resource "libvirt_domain" "instance" {
   #   inline = ["sudo hostnamectl set-hostname ${var.infra-node-names[count.index]}"]
   # }
 
-  count = length(var.infra-node-names)
+  count = length(var.infra-nodes)
 
 }
 
