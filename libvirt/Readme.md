@@ -1,3 +1,9 @@
+```
+$ virsh --connect=qemu:///system domifaddr  --domain master --source agent | awk '!/^ -|^ lo|-| Name/ {print $4}'
+```
+
+
+
 
 >NOTE: Recover Static IP addresses:
 >```
@@ -15,3 +21,36 @@
 alias tssh='ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/provision -l provision'
 
 ```
+
+
+Error: Error in function call
+
+  on main.tf line 26, in data "template_file" "network_config":
+  26:   template = file("${path.module}/cloudinit_net_${lookup(var.infra-nodes[count.index], "net_type")}.cfg")
+    |----------------
+    | count.index is 2
+    | var.infra-nodes is list of map of string with 4 elements
+
+Call to function "lookup" failed: lookup failed to find 'net_type'.
+
+
+Error: Error in function call
+
+  on main.tf line 26, in data "template_file" "network_config":
+  26:   template = file("${path.module}/cloudinit_net_${lookup(var.infra-nodes[count.index], "net_type")}.cfg")
+    |----------------
+    | count.index is 1
+    | var.infra-nodes is list of map of string with 4 elements
+
+Call to function "lookup" failed: lookup failed to find 'net_type'.
+
+
+Error: Error in function call
+
+  on main.tf line 26, in data "template_file" "network_config":
+  26:   template = file("${path.module}/cloudinit_net_${lookup(var.infra-nodes[count.index], "net_type")}.cfg")
+    |----------------
+    | count.index is 3
+    | var.infra-nodes is list of map of string with 4 elements
+
+Call to function "lookup" failed: lookup failed to find 'net_type'.

@@ -20,12 +20,39 @@ kvm_bridge_interface = "br0"
 
 infra-nodes = [
       {
-        "nodename"  = "test1",
+        "nodename"  = "master",
         "vcpu" = "2",
         "mem_in_gb" = "4",
         "sysdisk_in_gb" = 15,
         "datadisk_in_gb" = 20,
         "net_type" = "static",
-        "nodeip_with_mask" = "192.168.202.211/24"
+        "nodeip_with_mask" = "192.168.202.10/24"
      },
-    ]
+     {
+        "nodename"  = "node1",
+        "vcpu" = "2",
+        "mem_in_gb" = "6",
+        "sysdisk_in_gb" = 15,
+        "datadisk_in_gb" = 20,
+        "net_type" = "static",
+        "nodeip_with_mask" = "192.168.202.11/24"
+     },
+     {
+        "nodename"  = "node2",
+        "vcpu" = "2",
+        "mem_in_gb" = "6",
+        "sysdisk_in_gb" = 15,
+        "datadisk_in_gb" = 20,
+        "net_type" = "static",
+        "nodeip_with_mask" = "192.168.202.12/24"
+     },
+     {
+        "nodename"  = "node3",
+        "vcpu" = "2",
+        "mem_in_gb" = "6",
+        "sysdisk_in_gb" = 15,
+        "datadisk_in_gb" = 20,
+        "net_type" = "static",
+        "nodeip_with_mask" = "192.168.202.13/24"
+     },          
+]

@@ -80,13 +80,27 @@ resource "libvirt_domain" "instance" {
 
   }
 
+/* FILE
+  provisioner "file" {
+    connection {
+      type     = "ssh"
+      user     = "provision"
+      host_key = "provision"
+      host     = "${var.host}"
+    }
+    source      = "testfile.txt"
+    destination = "/tmp/testfile.conf"
+  }
+*/
 
-    /*network_interface {
+/* NETWORK 
+  network_interface {
         network_id = libvirt_network.vm_network.id
         network_name = var.infra-network-name
         wait_for_lease = var.infra-network-type == "dhcp" ? true : false
-    }*/
-    //network_interface { bridge = var.kvm_bridge_interface }
+    }
+*/
+  //network_interface { bridge = var.kvm_bridge_interface }
 
   /* IMPORTANT
    Ubuntu can hang is a isa-serial is not present at boot time.
@@ -119,16 +133,28 @@ resource "libvirt_domain" "instance" {
     autoport = "true"
   }
 
-  # provisioner "remote-exec" {
-  #   connection {
-  #     type     = "ssh"
-  #     user     = "provision"
-  #     password = "${var.root_password}"
-  #     host     = var.infra-network-addresses[count.index]
-  #     private_key = file("${path.module}/provision")
-  #   }
-  #   inline = ["sudo hostnamectl set-hostname ${var.infra-node-names[count.index]}"]
-  # }
+/* REMOTE-EXEC
+  provisioner "remote-exec" {
+    connection {
+      type     = "ssh"
+      user     = "provision"
+      password = "${var.root_password}"
+      host     = var.infra-network-addresses[count.index]
+      private_key = file("${path.module}/provision")
+    }
+    inline = ["sudo hostnamectl set-hostname ${var.infra-node-names[count.index]}"]
+  }
+*/
+
+/*  LOCAL-EXEC
+  provisioner "local-exec" {
+    command = "virsh --connect=$SERVER domifaddr --domain  $NODE --source agent | awk '!/^ -|^ lo|-| Name/ {print $4}' >$NODE.ip"
+      environment = {
+      SERVER = "qemu:///system"
+      NODE = "${lookup(var.infra-nodes[count.index], "nodename")}"
+    }
+  }
+*/
 
   count = length(var.infra-nodes)
 
