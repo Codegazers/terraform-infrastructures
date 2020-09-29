@@ -33,7 +33,7 @@ infra-nodes = [
         "vcpu" = "2",
         "mem_in_gb" = "6",
         "sysdisk_in_gb" = 15,
-        "datadisk_in_gb" = 20,
+        "datadisk_in_gb" = 30,
         "net_type" = "static",
         "nodeip_with_mask" = "192.168.202.11/24"
      },
@@ -42,7 +42,7 @@ infra-nodes = [
         "vcpu" = "2",
         "mem_in_gb" = "6",
         "sysdisk_in_gb" = 15,
-        "datadisk_in_gb" = 20,
+        "datadisk_in_gb" = 30,
         "net_type" = "static",
         "nodeip_with_mask" = "192.168.202.12/24"
      },
@@ -51,7 +51,7 @@ infra-nodes = [
         "vcpu" = "2",
         "mem_in_gb" = "6",
         "sysdisk_in_gb" = 15,
-        "datadisk_in_gb" = 20,
+        "datadisk_in_gb" = 30,
         "net_type" = "static",
         "nodeip_with_mask" = "192.168.202.13/24"
      },          
