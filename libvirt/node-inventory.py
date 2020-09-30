@@ -11,6 +11,7 @@ hostname = socket.gethostbyaddr(socket.gethostname())[0]
 host_domain = 'qemu:///system'
 
 virthost = libvirt.open(host_domain)
+
 if virthost == None:
     sys.stderr.write('Failed to open connection to ' + host_domain, file=sys.stderr)
     exit(1)
@@ -39,9 +40,13 @@ for domain in activedomains:
         vmstate="suspended"
     else:
         vmstate="unknown"
+
     inventory[domain.name()]={}
     state, maxmem, mem, cpus, cput = dom.info()
-    inventory[domain.name()]['hostname']=domain.hostname()
+    try:
+        inventory[domain.name()]['hostname']=domain.hostname()
+    except:
+        exit(1)
     inventory[domain.name()]['vmstate']=vmstate
     inventory[domain.name()]['mem']=str(maxmem/1024/1024)+"GB/"+str(mem/1024/1024)+"GB"
     inventory[domain.name()]['cpu']=cpus

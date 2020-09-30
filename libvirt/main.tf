@@ -23,12 +23,12 @@ data "template_file" "user_data" {
 
 data "template_file" "network_config" {
   count = length(var.infra-nodes)
-  template = file("${path.module}/cloudinit_net_${lookup(var.infra-nodes[count.index], "net_type")}.cfg")
+  template = file("${path.module}/cloudinit_net_${lookup(var.infra-nodes[count.index], "net_type", "dhcp")}.cfg")
   vars = {
     Domain = var.infra-network-domain
     NameServer = var.infra-network-nameserver
     Gateway = var.infra-network-gateway
-    IPAddress = lookup(var.infra-nodes[count.index], "nodeip_with_mask")
+    IPAddress = lookup(var.infra-nodes[count.index], "nodeip_with_mask", "use_dhcp")
   }
 }
 
@@ -73,10 +73,10 @@ resource "libvirt_domain" "instance" {
 
   network_interface {
     network_id = var.infra-network-bridge == false ? libvirt_network.vm_network.id : null
-    network_name = var.infra-network-bridge == "internal" ? var.infra-network-name : null
+    network_name = var.infra-network-bridge == false ? var.infra-network-name : null
     bridge = var.infra-network-bridge == false ? null : var.kvm_bridge_interface
-
-    wait_for_lease = lookup(var.infra-nodes[count.index], "net_type") == "dhcp" ? true : false
+    mac = lookup(var.infra-nodes[count.index], "mac", null)
+    wait_for_lease = lookup(var.infra-nodes[count.index], "net_type","dhcp") == "dhcp" ? true : false
 
   }
 
@@ -160,9 +160,15 @@ resource "libvirt_domain" "instance" {
 
 }
 
-output "ips" {
-  value = libvirt_domain.instance.*.network_interface.0.addresses
+
+resource "null_resource" "infrastructure" {
+  provisioner "local-exec" {
+    command = "./node-inventory.py"
+  }
 }
+# output "ips" {
+#   value = libvirt_domain.instance.*.network_interface.0.addresses
+# }
 
 terraform {
   required_version = ">= 0.12"

@@ -17,15 +17,19 @@ kvm_bridge_interface = "br0"
 
 
 # Configuration for each node
-
+   # - We can avoid using specific mac address removing "mac" key.
+   # - Default net_type is dhcp
+   #         "net_type" = "static",
+   #         "nodeip_with_mask" = "192.168.202.10/24"
 infra-nodes = [
       {
         "nodename"  = "master",
         "vcpu" = "2",
         "mem_in_gb" = "4",
-        "sysdisk_in_gb" = 15,
-        "datadisk_in_gb" = 20,
+        "sysdisk_in_gb" = 10,
+        "datadisk_in_gb" = 10
         "net_type" = "static",
+        "mac" = "52:54:00:b2:2f:80",
         "nodeip_with_mask" = "192.168.202.10/24"
      },
      {
@@ -35,6 +39,7 @@ infra-nodes = [
         "sysdisk_in_gb" = 15,
         "datadisk_in_gb" = 30,
         "net_type" = "static",
+        "mac" = "52:54:00:b2:2f:81",
         "nodeip_with_mask" = "192.168.202.11/24"
      },
      {
@@ -44,6 +49,7 @@ infra-nodes = [
         "sysdisk_in_gb" = 15,
         "datadisk_in_gb" = 30,
         "net_type" = "static",
+        "mac" = "52:54:00:b2:2f:82",
         "nodeip_with_mask" = "192.168.202.12/24"
      },
      {
@@ -53,6 +59,7 @@ infra-nodes = [
         "sysdisk_in_gb" = 15,
         "datadisk_in_gb" = 30,
         "net_type" = "static",
+        "mac" = "52:54:00:b2:2f:83",
         "nodeip_with_mask" = "192.168.202.13/24"
      },          
 ]
