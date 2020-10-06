@@ -27,7 +27,7 @@ data "template_file" "network_config" {
   vars = {
     Domain = var.infra-network-domain
     NameServer = var.infra-network-nameserver
-    Gateway = var.infra-network-gateway
+    Gateway = lookup(var.infra-nodes[count.index], "nodeip_gateway","use_dhcp")
     IPAddress = lookup(var.infra-nodes[count.index], "nodeip_with_mask", "use_dhcp")
   }
 }
@@ -161,11 +161,13 @@ resource "libvirt_domain" "instance" {
 }
 
 
-resource "null_resource" "infrastructure" {
-  provisioner "local-exec" {
-    command = "./node-inventory.py"
-  }
-}
+#resource "null_resource" "infrastructure" {
+#  provisioner "local-exec" {
+#    command = "./node-inventory.py"
+#  }
+#}
+
+
 # output "ips" {
 #   value = libvirt_domain.instance.*.network_interface.0.addresses
 # }

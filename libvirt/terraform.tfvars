@@ -6,9 +6,8 @@ infra-os-base-url = "/virtual/kvm_pools/labs/bionic64-base-image.img"
 infra-network-name = "labs"
 infra-network-domain = "labs"
 infra-network-nameserver = "8.8.8.8"
-infra-network-gateway = "192.168.202.1"
-infra-network-subnet = ["192.168.202.0/24"]
-infra-network-bridge = false #
+#infra-network-subnet = ["192.168.202.0/23"] # Only for non-ip-static environments and should not exist in your host.
+infra-network-bridge = true #
 
 
 private_key_path = "../keys/provision"
@@ -30,7 +29,8 @@ infra-nodes = [
         "datadisk_in_gb" = 10
         "net_type" = "static",
         "mac" = "52:54:00:b2:2f:80",
-        "nodeip_with_mask" = "192.168.202.10/24"
+        "nodeip_with_mask" = "192.168.201.110/23",
+        "nodeip_gateway" = "192.168.200.1"
      },
      {
         "nodename"  = "node1",
@@ -40,7 +40,8 @@ infra-nodes = [
         "datadisk_in_gb" = 30,
         "net_type" = "static",
         "mac" = "52:54:00:b2:2f:81",
-        "nodeip_with_mask" = "192.168.202.11/24"
+        "nodeip_with_mask" = "192.168.201.111/23",
+        "nodeip_gateway" = "192.168.200.1"
      },
      {
         "nodename"  = "node2",
@@ -50,7 +51,8 @@ infra-nodes = [
         "datadisk_in_gb" = 30,
         "net_type" = "static",
         "mac" = "52:54:00:b2:2f:82",
-        "nodeip_with_mask" = "192.168.202.12/24"
+        "nodeip_with_mask" = "192.168.201.112/23",
+        "nodeip_gateway" = "192.168.200.1"
      },
      {
         "nodename"  = "node3",
@@ -60,6 +62,7 @@ infra-nodes = [
         "datadisk_in_gb" = 30,
         "net_type" = "static",
         "mac" = "52:54:00:b2:2f:83",
-        "nodeip_with_mask" = "192.168.202.13/24"
-     },          
+        "nodeip_with_mask" = "192.168.201.113/23",
+        "nodeip_gateway" = "192.168.200.1"
+     },
 ]
