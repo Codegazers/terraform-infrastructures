@@ -100,7 +100,7 @@ resource "libvirt_domain" "instance" {
         wait_for_lease = var.infra-network-type == "dhcp" ? true : false
     }
 */
-  //network_interface { bridge = var.kvm_bridge_interface }
+  network_interface { bridge = var.kvm_bridge_interface }
 
   /* IMPORTANT
    Ubuntu can hang is a isa-serial is not present at boot time.
